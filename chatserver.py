@@ -21,9 +21,9 @@ from django.core.handlers.wsgi import WSGIHandler
 
 shared_messages = {}
 
-rethink = r.connect(host='localhost', port=28015)
-if 'chat' not in rethink.db_list().run():
-    rethink.db_create('chat').run()
+r.connect(host='localhost', port=28015).repl()
+if 'chat' not in r.db_list().run():
+    r.db_create('chat').run()
 resource = HttpChat(shared_messages)
 factory = Site(resource)
 ws_resource = WebSocketsResource(lookupProtocolForFactory(resource.wsFactory))

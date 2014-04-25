@@ -3,5 +3,6 @@ Twisted==13.1.0
 
 rethinkdb
 simplejson
+redis
 
 npm install underscore

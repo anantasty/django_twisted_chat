@@ -40,9 +40,9 @@
       else{
         
         list_element.innerHTML = _.template(template, {item: msg});
+        $("#message_list ul").append(list_element);
+        register_msg(msg.id);
       }
-      $("#message_list ul").append(list_element);
-      register_msg(msg.id);
     };
 
     var inputBox = document.getElementById("inputbox");
