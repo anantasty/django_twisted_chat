@@ -2,16 +2,23 @@
 {% load staticfiles %}
 {% block header %}
 {{ block.super }}
- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript" src="{% static "underscore-min.js" %}"></script>
+
  <script type="text/javascript" src="{% static "jquery.gracefulWebSocket.js" %}"></script>
  <script type="text/javascript">
     $(document).ready( function() {
 
     function register_msg(message_id){
-       var selector = '.'+message_id;
+       var selector = '.'+message_id+' .like-message';
        $(selector).on('click', function(event) {
          chat.send({command: 'like', ref: message_id, user: '{{ user }}'}); 
        });
+    }
+
+    function handle_likes(message){
+      var likes = message.data.likes;
+      $('.'+message.ref+' .likes').html(likes);
     }
 
     window.chat = {};
@@ -24,13 +31,15 @@
       var messageFromServer = event.data;
       var list_element = document.createElement('li');
       var msg = $.parseJSON(messageFromServer);
+      var template = $("#messageTemplate")[0].innerHTML;
       if (msg.command){
        if (msg.command == 'like'){
-           list_element.innerHTML = '<a href="#" data-id='+msg.id+' class="'+msg.id+'"> Meessage:' + msg.user +' liked your post</a>';
+           handle_likes(msg);
          }
       }
       else{
-        list_element.innerHTML = '<a href="#" data-id='+msg.id+' class="'+msg.id+'"> Meessage:' + msg.msg +'</a>';
+        
+        list_element.innerHTML = _.template(template, {item: msg});
       }
       $("#message_list ul").append(list_element);
       register_msg(msg.id);
@@ -51,4 +60,12 @@
     });
  </script>
 <h1> {{ user }} </h1>
+<script type="text/html" id="messageTemplate">
+
+<div data-id="<%= item.id %>" class="<%= item.id %>">
+  <div class="likes"><%= item.likes %></div>
+  <div class="message"><%= item.msg %></div>
+  <div class="like-message"><a href="#">LIKE</a></div>
+</div>
+</script>
 {% endblock %}

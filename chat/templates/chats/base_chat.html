@@ -1,5 +1,9 @@
 {% extends "base.html" %}
-
+{% load staticfiles %}
+{% block js %}
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript" src="{% static "underscore-min.js" %}"></script>
+{% endblock %}
 {% block content %}
 {{ block.super }}
 <h1> {{ chat.name }} </h1>

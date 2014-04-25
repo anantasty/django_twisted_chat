@@ -15,14 +15,31 @@ class WebsocketChat(basic.LineReceiver):
         print "Lost a client!"
         self.factory.clients.remove(self)
 
+    def _handle_likes(self, message):
+        ref_msg = self.factory.messages.get(message['ref'])
+        ref_msg['likes'] = ref_msg.get('likes', 0) + 1
+        message['data'] = {'likes': ref_msg['likes']}
+        return message
+
+    def command_handler(self, message):
+        if not message.get('command'):
+            return message
+        if message.get('command') == 'like':
+            message = self._handle_likes(message)
+        return message
+
     def dataReceived(self, data):
         try:
+            print "self is :{}".format(self.__dict__)
             obj = simplejson.loads(data)
             obj['id'] = str(uuid.uuid1())
-            self.factory.messages[float(time.time())] = obj
+            if not 'likes' in obj:
+                obj['likes'] =0
+            obj = self.command_handler(obj)
+            self.factory.messages[obj['id']] = obj
             self.updateClients(obj)
-        except:
-            pass
+        except Exception as e:
+            raise
 
     def updateClients(self, data):
         for c in self.factory.clients:
