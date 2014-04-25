@@ -83,8 +83,8 @@
 							type: opts.fallbackSendMethod,
 							url: opts.fallbackSendURL + '?' + $.param( getFallbackParams() ),
 							data: data,
-							dataType: 'text',
-							contentType : "application/x-www-form-urlencoded; charset=utf-8",
+							dataType: 'json',
+							contentType : "application/json",
 							success: pollSuccess,
 							error: function (xhr) {
 								success = false;
@@ -132,7 +132,7 @@
 					$.ajax({
 						type: opts.fallbackPollMethod,
 						url: opts.fallbackPollURL,
-						dataType: 'text',
+						dataType: 'json',
 						data: getFallbackParams(),
 						success: pollSuccess,
 						error: function (xhr) {			

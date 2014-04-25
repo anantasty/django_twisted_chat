@@ -28,7 +28,9 @@ root.putChild("",resource) #the http protocol is up at /
 root.putChild("ws",ws_resource) #the websocket protocol is at /ws
 
 application = service.Application("chatserver")
+print "starting chat server"
 internet.TCPServer(1025, Site(root)).setServiceParent(application)
+print "chat server startedf"
 
 #serving django over wsgi
 # Create and start a thread pool,
@@ -41,5 +43,5 @@ django_resource = wsgi.WSGIResource(reactor, wsgiThreadPool, django_application)
 django_root = WsgiRoot(django_resource)
 project_dir = os.getcwd()
 django_root.putChild('static', StaticFileScanner(project_dir + "/chat/static", project_dir + "/django_twisted_chat/static"))
-
+print "Starting django"
 internet.TCPServer(8000, Site(django_root)).setServiceParent(application)

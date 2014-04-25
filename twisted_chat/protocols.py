@@ -1,4 +1,6 @@
 import time
+import simplejson
+import uuid
 
 from twisted.protocols import basic
 
@@ -14,12 +16,18 @@ class WebsocketChat(basic.LineReceiver):
         self.factory.clients.remove(self)
 
     def dataReceived(self, data):
-        self.factory.messages[float(time.time())] = data
-        self.updateClients(data)
+        try:
+            obj = simplejson.loads(data)
+            obj['id'] = str(uuid.uuid1())
+            self.factory.messages[float(time.time())] = obj
+            self.updateClients(obj)
+        except:
+            pass
 
     def updateClients(self, data):
         for c in self.factory.clients:
             c.message(data)
 
     def message(self, message):
-        self.transport.write(message + '\n')
+        print message
+        self.transport.write(simplejson.dumps(message))
