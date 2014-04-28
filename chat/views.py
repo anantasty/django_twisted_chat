@@ -2,15 +2,14 @@ import hashlib
 
 import rethinkdb as rdb
 
-from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.generic.edit import FormView
-from django.core.mail import send_mail
 
 from chat import mixins
 from chat.models import ChatRoom
-from chat.forms import ChatUserForm, ChatUserInviteForm
+from chat.forms import ChatUserForm, ChatUserInviteForm, ChangePasswordForm
+from chat import utils
 
 rdb.connect('localhost',28015, db='chat').repl()
 
@@ -53,6 +52,7 @@ class RegisterationView(FormView):
         user = form.save(commit=False)
         user.score = 1
         user.save()
+        utils.user_invite_handler(user, self.request)
         return super(RegisterationView, self).form_valid(form)
 
 
@@ -61,15 +61,21 @@ class UserInvitationView(mixins.LoginRequiredMixin, RegisterationView):
 
     def form_valid(self, form):
         user = form.save(commit=False)
-        user.referral_user = self.request.user
+        user.referral_user = self.request.user.chatuser
         user.save()
-        subject = '{}! Invitation to sign up for hoops.com'.format(
-            user.first_name)
-        message = "{} {} You have been invited to sign up for..".format(
-            'SITE_URL')
-        from_email = user.referral_user.email or settings.DEFAULT_FROM_EMAIL
-        send_mail(subject, message, from_email, [user.email])
+        utils.user_invite_handler(user, self.request)
         return super(RegisterationView, self).form_valid(form)
+
+
+class InviteAcceptView(FormView):
+    template_name = 'chats/register.html'
+    form_class = ChangePasswordForm
+    success_url = 'chats/thanks/'
+
+    def form_valid(self, form):
+        uid = self.kwargs.get('uid')
+        utils.set_password(uid, form.cleaned_data.get('password1'))
+        return super(InviteAcceptView, self).form_valid(form)
 
 
 def thanks(request):

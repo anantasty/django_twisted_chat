@@ -18,12 +18,14 @@ from twisted.python.threadpool import ThreadPool
 from django.core.handlers.wsgi import WSGIHandler
 
 
-
 shared_messages = {}
 
 r.connect(host='localhost', port=28015).repl()
 if 'chat' not in r.db_list().run():
     r.db_create('chat').run()
+if 'user' not in r.table_list().run():
+    r.table_create('user').run()
+
 resource = HttpChat(shared_messages)
 factory = Site(resource)
 ws_resource = WebSocketsResource(lookupProtocolForFactory(resource.wsFactory))
