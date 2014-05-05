@@ -10,5 +10,7 @@ urlpatterns = patterns('',
         url(r'^invite/', views.UserInvitationView.as_view(), name='invite'),
         url(r'^respond_invite/(?P<uid>\w+)/$',
             views.InviteAcceptView.as_view(), name='invite_accept'),
+        url(r'^create_chat/$',
+            views.CreateRoom.as_view(), name='create_chat'),
         url(r'^thanks', views.thanks, name='thanks'),
 )

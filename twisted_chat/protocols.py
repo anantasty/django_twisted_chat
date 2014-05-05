@@ -7,7 +7,6 @@ from twisted.protocols import basic
 
 class WebsocketChat(basic.LineReceiver):
     def connectionMade(self):
-        print "Got new client!"
         self.transport.write('connected ....\n')
         self.factory.clients.append(self)
 
@@ -38,7 +37,7 @@ class WebsocketChat(basic.LineReceiver):
             obj = self.command_handler(obj)
             self.factory.messages[obj['id']] = obj
             self.updateClients(obj)
-        except Exception as e:
+        except Exception:
             raise
 
     def updateClients(self, data):
