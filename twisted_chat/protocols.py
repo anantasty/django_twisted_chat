@@ -7,7 +7,7 @@ from twisted.protocols import basic
 
 class WebsocketChat(basic.LineReceiver):
     def connectionMade(self):
-        self.transport.write('connected ....\n')
+        self.message({'command': 'connected'})
         self.factory.clients.append(self)
 
     def connectionLost(self, reason):

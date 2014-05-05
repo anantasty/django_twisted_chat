@@ -32,13 +32,17 @@ def generate_user_hash(chat, user):
 def register_hash(user, md5_hash):
     pass
 
+
 @login_required
 def chat_room(request, chat_room_id):
     chat = get_object_or_404(ChatRoom, pk=chat_room_id)
     md5_hash = generate_user_hash(chat, request.user)
     register_hash(request.user, md5_hash)
-    return render(request, 'chats/chat_room.html', {'chat': chat,
+    resp = render(request, 'chats/chat_room.html', {'chat': chat,
                                                     'user': request.user})
+    resp.set_cookie('TEST', 'HELLO')
+    return resp
+
 
 @login_required
 def longpoll_chat_room(request, chat_room_id):
