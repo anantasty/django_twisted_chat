@@ -1,6 +1,7 @@
 import hashlib
 
 import rethinkdb as rdb
+from redis import Redis
 
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -9,12 +10,14 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 
 from chat import mixins
+from chat import constants
 from chat.models import ChatRoom
 from chat.forms import (ChatUserForm, ChatUserInviteForm,
                         ChangePasswordForm, ChatRoomForm)
 from chat import utils
 
 rdb.connect('localhost',28015, db='chat').repl()
+redis = Redis('localhost', db=2)
 
 @login_required
 def index(request):
@@ -29,18 +32,21 @@ def generate_user_hash(chat, user):
     md5_hash.update('{}{}'.format(chat, user))
     return md5_hash.hexdigest()
 
-def register_hash(user, md5_hash):
-    pass
+def register_hash(user, md5_hash, chat):
+    redis.lpush(constants.USER_KEY.format(user.username), md5_hash)
+    redis.ltrim(constants.USER_KEY.format(user.username), 0, 10)
+    redis.hmset(constants.USER_HASH_KEY.format(md5_hash), {'user':user.username,
+                                                           'chat': chat.pk})
 
 
 @login_required
 def chat_room(request, chat_room_id):
     chat = get_object_or_404(ChatRoom, pk=chat_room_id)
     md5_hash = generate_user_hash(chat, request.user)
-    register_hash(request.user, md5_hash)
+    register_hash(request.user, md5_hash, chat)
     resp = render(request, 'chats/chat_room.html', {'chat': chat,
                                                     'user': request.user})
-    resp.set_cookie('TEST', 'HELLO')
+    resp.set_cookie('user_hash', md5_hash)
     return resp
 
 
