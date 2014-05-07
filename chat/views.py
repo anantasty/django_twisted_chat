@@ -27,12 +27,12 @@ def index(request):
     }
     return render(request,'chats/index.html', context)
 
-def generate_user_hash(chat, user):
+def _generate_user_hash(chat, user):
     md5_hash = hashlib.md5()
     md5_hash.update('{}{}'.format(chat, user))
     return md5_hash.hexdigest()
 
-def register_hash(user, md5_hash, chat):
+def _register_hash(user, md5_hash, chat):
     redis.lpush(constants.USER_KEY.format(user.username), md5_hash)
     redis.ltrim(constants.USER_KEY.format(user.username), 0, 10)
     redis.hmset(constants.USER_HASH_KEY.format(md5_hash), {'user':user.username,
@@ -42,8 +42,8 @@ def register_hash(user, md5_hash, chat):
 @login_required
 def chat_room(request, chat_room_id):
     chat = get_object_or_404(ChatRoom, pk=chat_room_id)
-    md5_hash = generate_user_hash(chat, request.user)
-    register_hash(request.user, md5_hash, chat)
+    md5_hash = _generate_user_hash(chat, request.user)
+    _register_hash(request.user, md5_hash, chat)
     resp = render(request, 'chats/chat_room.html', {'chat': chat,
                                                     'user': request.user})
     resp.set_cookie('user_hash', md5_hash)
@@ -94,11 +94,13 @@ class InviteAcceptView(FormView):
 def thanks(request):
     render(request, 'chats/thanks.html')
 
-class CreateRoom(FormView):
+class CreateRoom(mixins.LoginRequiredMixin, FormView):
     template_name = 'chats/create_room.html'
     form_class = ChatRoomForm
 
     def form_valid(self, form):
-        chat_room = form.save()
+        chat_room = form.save(commit=False)
+        chat_room.created_by = request.user
+        chat_room.save()
         url = reverse('chat_room', kwargs={'chat_room_id': chat_room.id})
         return HttpResponseRedirect(url)

@@ -21,7 +21,6 @@ class WsParent(Resource):
         if not factory:
             factory = self.wsFactory(name)
             self.factories[name] = factory
-
         return WebSocketsResource(lookupProtocolForFactory(factory))
 
     def getChildWithDefault(self, path, request):
