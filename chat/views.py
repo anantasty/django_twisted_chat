@@ -7,7 +7,9 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.generic.edit import FormView
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
+from django.db.models import Q
+from django.utils import simplejson
 
 from chat import mixins
 from chat import constants
@@ -107,7 +109,7 @@ class CreateRoom(mixins.LoginRequiredMixin, FormView):
 
 
 class ChatInviteView(mixins.LoginRequiredMixin, FormView):
-    template_name = 'chats/create_room.html'
+    template_name = 'chats/invite_to_chat.html'
     form_class = InviteToChatForm
 
     def form_valid(self, form):
@@ -118,3 +120,18 @@ class ChatInviteView(mixins.LoginRequiredMixin, FormView):
         form = super(ChatInviteView, self).get_form(form_class)
         form.set_user(self.request.user)
         return form
+
+
+@login_required
+def friends_autocomplete(request):
+    user = request.user.chatuser
+    query = request.GET.get('query')
+    matching_friends = user.friends.filter(Q(username__startswith=query) |
+                                           Q(first_name__startswith=query) |
+                                           Q(last_name__startswith=query) |
+                                           Q(email__startswith=query))
+    friends_list = [{'id': friend.pk, 'label': '{} {}'.format(
+        friend.first_name, friend.last_name)} for friend in matching_friends]
+    json_dict = {'friends': friends_list}
+    return HttpResponse(simplejson.dumps(json_dict),
+                        mimetype='application/json')

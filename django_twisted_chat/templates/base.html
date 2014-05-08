@@ -6,18 +6,16 @@
 <script src="{% static "tag-it.js" %}" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript" src="{% static "underscore-min.js" %}"></script>
 {% endblock %}
+
 {% block css %}
 <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
 <link href="{% static "jquery.tagit.css" %} rel="stylesheet" type="text/css">
 {% endblock %}
+
 {% block title %}
         Some Chat App
 {% endblock %}
 
 {% block header %}
         Welcome {{ user.username }}! Chat to your heart's content :) <br/><a href="/accounts/logout">logout</a>
-{% endblock %}
-
-{% block page-js %}
-
 {% endblock %}

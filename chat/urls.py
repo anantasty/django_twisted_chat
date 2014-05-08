@@ -14,5 +14,7 @@ urlpatterns = patterns('',
             views.CreateRoom.as_view(), name='create_chat'),
                        url(r'^invite_chat/(?P<chat>\d+)/$',
             views.ChatInviteView.as_view(), name='create_chat'),
+        url(r'^friends_autocomplete/$', views.friends_autocomplete,
+            name='friends_autocomplete'),
         url(r'^thanks', views.thanks, name='thanks'),
 )
