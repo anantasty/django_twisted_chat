@@ -17,5 +17,5 @@ class ChatUser(User):
                                           MaxValueValidator(4)])
     referral_user = models.ForeignKey("ChatUser", null=True, blank=True)
     friends = models.ManyToManyField('ChatUser', null=True, blank=True,
-                                     related_name='friends')
+                                     related_name='friend_to')
 

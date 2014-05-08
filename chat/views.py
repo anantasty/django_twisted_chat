@@ -13,7 +13,7 @@ from chat import mixins
 from chat import constants
 from chat.models import ChatRoom
 from chat.forms import (ChatUserForm, ChatUserInviteForm,
-                        ChangePasswordForm, ChatRoomForm)
+                        ChangePasswordForm, ChatRoomForm, InviteToChatForm)
 from chat import utils
 
 rdb.connect('localhost',28015, db='chat').repl()
@@ -100,7 +100,21 @@ class CreateRoom(mixins.LoginRequiredMixin, FormView):
 
     def form_valid(self, form):
         chat_room = form.save(commit=False)
-        chat_room.created_by = request.user
+        chat_room.created_by = self.request.user
         chat_room.save()
         url = reverse('chat_room', kwargs={'chat_room_id': chat_room.id})
         return HttpResponseRedirect(url)
+
+
+class ChatInviteView(mixins.LoginRequiredMixin, FormView):
+    template_name = 'chats/create_room.html'
+    form_class = InviteToChatForm
+
+    def form_valid(self, form):
+        f = form.cleaned_data
+        raise Exception(f)
+
+    def get_form(self, form_class):
+        form = super(ChatInviteView, self).get_form(form_class)
+        form.set_user(self.request.user)
+        return form
