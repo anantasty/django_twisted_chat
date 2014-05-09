@@ -9,7 +9,7 @@
     $(document).ready( function() {
     $('.fancybox').fancybox({type: 'iframe',
                              afterClose: function(){ parent.window.reload;}
-                            })
+                            });
     function register_msg(message_id){
        var selector = '.'+message_id+' .like-message';
        $(selector).on('click', function(event) {

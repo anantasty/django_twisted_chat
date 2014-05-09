@@ -1,7 +1,20 @@
 {% extends "base.html" %}
-
+{% block page-js %}
+<script>
+$(document).ready(
+function(){
+    $('.fancybox').fancybox({type: 'iframe',
+                             afterClose: function(){ parent.window.reload;}
+                            });
+});
+</script>
+{% endblock %}
 {% block content %}
 {{ block.super }}
+<div>
+<a href="{% url 'invite' %}" class='fancybox'> Invite people to chat</a>
+<a href="{% url 'create_chat' %}" class='fancybox'> Create a new chat </a>
+</div>
 {% if chat_list %}
     <ul>
     {% for chat in chat_list %}
