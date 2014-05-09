@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+
+{{ block.super }}
+
+<h1> Invite To Chat </h1>
+<form action="" method="post">
+  {% csrf_token %}
+{% for field in form %}
+  {% include "chats/base_field.html" %}
+
+{% endfor %}
+
+<input type="submit" value="Invite" />
+</form>
+{% endblock %}
+
+{% block page-js %}
+<script>
+$(document).ready(function(){
+    $('#id_users').tagsInput({
+        height: '40px',
+        autocomplete_url:'{% url "friends_autocomplete" %}'
+    });
+});
+</script>
+{% endblock %}
