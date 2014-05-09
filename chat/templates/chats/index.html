@@ -4,7 +4,8 @@
 $(document).ready(
 function(){
     $('.fancybox').fancybox({type: 'iframe',
-                             afterClose: function(){ parent.window.reload;}
+                             onClosed: function(){parent.location.reload(true);},
+                             afterClose: function(){ parent.location.reload(true);}
                             });
 });
 </script>
@@ -12,8 +13,8 @@ function(){
 {% block content %}
 {{ block.super }}
 <div>
-<a href="{% url 'invite' %}" class='fancybox'> Invite people to chat</a>
-<a href="{% url 'create_chat' %}" class='fancybox'> Create a new chat </a>
+<a href="{% url 'invite' %}" class='fancybox'> Invite some one to join</a>
+<a href="{% url 'create_chat' %}" class='fancybox chat-invite'> Create a new chat </a>
 </div>
 {% if chat_list %}
     <ul>

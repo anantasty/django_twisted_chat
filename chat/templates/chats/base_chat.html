@@ -12,7 +12,7 @@ $(document).ready(function(){
 {% block content %}
 {{ block.super }}
 <div>
-<a href="{% url 'invite' %}" class='fancybox'> Invite people to chat</a>
+<a href="{% url 'invite' %}" class='fancybox'> Invite some one to join</a>
 <a href="{% url 'create_chat' %}" class='fancybox'> Create a new chat </a>
 </div>
 <h1> {{ chat.name }} </h1>

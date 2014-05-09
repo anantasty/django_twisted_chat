@@ -1,24 +1,16 @@
 {% extends "base.html" %}
-{% block page-js %}
-<script>
-$(document).ready(
-    function(){
-        $('#id_end_time').datetimepicker();
-    }
-);
-</script>
-{% endblock %}
+
 {% block content %}
 
 {{ block.super }}
 
-<h1> Create a Room </h1>
+<h1> Invite a friend </h1>
 <form action="" method="post">
   {% csrf_token %}
 {% for field in form %}
   {% include "chats/base_field.html" %}
 
 {% endfor %}
-<input type="submit" value="Create Room" />
+<input type="submit" value="Send message" />
 </form>
 {% endblock %}

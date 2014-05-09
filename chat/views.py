@@ -88,6 +88,7 @@ class RegisterationView(FormView):
 
 class UserInvitationView(mixins.LoginRequiredMixin, RegisterationView):
     form_class = ChatUserInviteForm
+    template_name = 'chats/invite.html'
 
     def get_success_url(self):
         return reverse('index')
@@ -97,13 +98,12 @@ class UserInvitationView(mixins.LoginRequiredMixin, RegisterationView):
         user.referral_user = self.request.user.chatuser
         user.save()
         utils.user_invite_handler(user, self.request)
-        return super(RegisterationView, self).form_valid(form)
+        return HttpResponse('User has been invited')
 
 
 class InviteAcceptView(FormView):
     template_name = 'chats/register.html'
     form_class = ChangePasswordForm
-
 
     def get_success_url(self):
         return reverse('index')
@@ -130,7 +130,7 @@ class CreateRoom(mixins.LoginRequiredMixin, FormView):
                 days=7)
         chat_room.save()
         url = reverse('invite_to_chat', kwargs={'chat': chat_room.id})
-        return HttpResponseRedirect(url)
+        return HttpResponse('Chat created sucessfully')
 
 
 class ChatInviteView(mixins.LoginRequiredMixin, FormView):
