@@ -2,7 +2,7 @@
 {% load staticfiles %}
 {% block page-js %}
 <script>
-$.(document).ready(function(){
+$(document).ready(function(){
     $('.fancybox').fancybox({type: 'iframe',
                              afterClose: function(){ parent.window.reload;}
                             });

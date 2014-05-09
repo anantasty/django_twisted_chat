@@ -20,4 +20,4 @@ class ChatFactory(Factory):
         self.messages = {}
         self.chat_id = str(uuid.uuid1())
         self.client_map = defaultdict(list)
-
+        self.likes_map =  defaultdict(set)

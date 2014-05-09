@@ -1,4 +1,3 @@
-import time
 import simplejson
 import uuid
 
@@ -16,9 +15,19 @@ class WebsocketChat(basic.LineReceiver):
         self.factory.clients.remove(self)
 
     def _handle_likes(self, message):
-        ref_msg = self.factory.messages.get(message['ref'])
+        ref = message['ref']
+        user = message['user']
+        likes_map_msg_key = 'Message:{}'.format(ref)
+        likes_map_user_key = 'User:{}'.format(user)
+        ref_msg = self.factory.messages.get(ref)
+        likes_map = self.factory.likes_map
+        if likes_map_msg_key in likes_map and \
+          user in likes_map.get(likes_map_msg_key):
+          return message
         ref_msg['likes'] = ref_msg.get('likes', 0) + 1
         message['data'] = {'likes': ref_msg['likes']}
+        likes_map[likes_map_msg_key].add(user)
+        likes_map[likes_map_user_key].add(ref)
         return message
 
     def _handle_connection_registeration(self, message):

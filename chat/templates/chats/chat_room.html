@@ -18,6 +18,9 @@
     }
 
     function handle_likes(message){
+      if (!message.data) {
+        return false;
+      }
       var likes = message.data.likes;
       $('.'+message.ref+' .likes').html(likes);
     }
