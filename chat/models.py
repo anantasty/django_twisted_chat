@@ -6,6 +6,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 class ChatRoom(models.Model):
     name = models.CharField(max_length=200)
     created_by = models.ForeignKey("ChatUser", null=True, blank=True)
+    public = models.BooleanField(blank=True, default=True)
+    end_time = models.DateTimeField(null=True, blank=True)
 
     def __unicode__(self):
         return self.name

@@ -1,4 +1,5 @@
 import hashlib
+import datetime
 
 import rethinkdb as rdb
 from redis import Redis
@@ -13,17 +14,23 @@ from django.utils import simplejson
 
 from chat import mixins
 from chat import constants
-from chat.models import ChatRoom
+from chat.models import ChatRoom, ChatUser
 from chat.forms import (ChatUserForm, ChatUserInviteForm,
                         ChangePasswordForm, ChatRoomForm, InviteToChatForm)
 from chat import utils
 
+
 rdb.connect('localhost',28015, db='chat').repl()
 redis = Redis('localhost', db=2)
 
+
 @login_required
 def index(request):
-    chat_rooms = ChatRoom.objects.order_by('name')[:5]
+    invited_rooms = redis.smembers(constants.USER_INVITED_TO.format(
+        request.user.pk))
+    chat_rooms = ChatRoom.objects.filter(
+        Q(pk__in=invited_rooms) | Q(created_by=request.user) | Q(public=True),
+        end_time__gt=datetime.datetime.now()).order_by('name')[:5]
     context = {
         'chat_list': chat_rooms,
     }
@@ -61,18 +68,29 @@ def longpoll_chat_room(request, chat_room_id):
 class RegisterationView(FormView):
     template_name = 'chats/register.html'
     form_class = ChatUserForm
-    success_url = 'chats/thanks/'
+
+    def get_success_url(self):
+        return reverse('index')
 
     def form_valid(self, form):
         user = form.save(commit=False)
         user.score = 1
         user.save()
         utils.user_invite_handler(user, self.request)
+        invited_chats = redis.smembers(
+            constants.EMAIL_INVITED_TO.format(user.email))
+        for chat in invited_chats:
+            redis.sadd(constants.CHAT_INVITED_USERS.format(chat),
+                       user.usernames)
+            redis.sadd(constants.USER_INVITED_TO.format(user.username), chat)
         return super(RegisterationView, self).form_valid(form)
 
 
 class UserInvitationView(mixins.LoginRequiredMixin, RegisterationView):
     form_class = ChatUserInviteForm
+
+    def get_success_url(self):
+        return reverse('index')
 
     def form_valid(self, form):
         user = form.save(commit=False)
@@ -85,7 +103,10 @@ class UserInvitationView(mixins.LoginRequiredMixin, RegisterationView):
 class InviteAcceptView(FormView):
     template_name = 'chats/register.html'
     form_class = ChangePasswordForm
-    success_url = 'chats/thanks/'
+
+
+    def get_success_url(self):
+        return reverse('index')
 
     def form_valid(self, form):
         uid = self.kwargs.get('uid')
@@ -96,15 +117,19 @@ class InviteAcceptView(FormView):
 def thanks(request):
     render(request, 'chats/thanks.html')
 
+
 class CreateRoom(mixins.LoginRequiredMixin, FormView):
     template_name = 'chats/create_room.html'
     form_class = ChatRoomForm
 
     def form_valid(self, form):
         chat_room = form.save(commit=False)
-        chat_room.created_by = self.request.user
+        chat_room.created_by = self.request.user.chatuser
+        if not chat_room.end_time:
+            chat_room.end_time = datetime.datetime.now() + datetime.timedelta(
+                days=7)
         chat_room.save()
-        url = reverse('chat_room', kwargs={'chat_room_id': chat_room.id})
+        url = reverse('invite_to_chat', kwargs={'chat': chat_room.id})
         return HttpResponseRedirect(url)
 
 
@@ -113,8 +138,26 @@ class ChatInviteView(mixins.LoginRequiredMixin, FormView):
     form_class = InviteToChatForm
 
     def form_valid(self, form):
-        f = form.cleaned_data
-        raise Exception(f)
+        invitees = form.cleaned_data['users'].split(',')
+        chat = form.cleaned_data.get('chat')
+        users = ChatUser.objects.filter(username__in=invitees)
+        usernames = [user.username for user in users]
+        not_found = set(invitees) - set(usernames)
+        emails = [email for email in not_found if utils.validate_email(email)]
+        print emails
+        redis.sadd(constants.CHAT_INVITED_USERS.format(chat), *usernames)
+        for username in usernames:
+            redis.sadd(constants.USER_INVITED_TO.format(username), chat)
+        if not_found:
+            redis.sadd(constants.CHAT_INVITED_EMAILS.format(chat), *not_found)
+            for invitee_email in not_found:
+                redis.sadd(constants.EMAIL_INVITED_TO.format(invitee_email),
+                           chat)
+                utils.quick_user_invite_handler(invitee_email,
+                                                self.request.user.email,
+                                                    self.request)
+        return HttpResponseRedirect(reverse('chat_room',
+                                            kwargs={'chat_room_id': chat}))
 
     def get_form(self, form_class):
         form = super(ChatInviteView, self).get_form(form_class)
@@ -126,12 +169,16 @@ class ChatInviteView(mixins.LoginRequiredMixin, FormView):
 def friends_autocomplete(request):
     user = request.user.chatuser
     query = request.GET.get('query')
-    matching_friends = user.friends.filter(Q(username__startswith=query) |
-                                           Q(first_name__startswith=query) |
-                                           Q(last_name__startswith=query) |
-                                           Q(email__startswith=query))
+    if query:
+        matching_friends = user.friends.filter(Q(username__startswith=query) |
+                                               Q(first_name__startswith=query) |
+                                               Q(last_name__startswith=query) |
+                                               Q(email__startswith=query))
+    else:
+        matching_friends = user.friends.all()
+
     friends_list = [{'id': friend.pk, 'label': '{} {}'.format(
-        friend.first_name, friend.last_name)} for friend in matching_friends]
-    json_dict = {'friends': friends_list}
-    return HttpResponse(simplejson.dumps(json_dict),
+        friend.first_name, friend.last_name), 'value': friend.username}
+        for friend in matching_friends]
+    return HttpResponse(simplejson.dumps(friends_list),
                         mimetype='application/json')

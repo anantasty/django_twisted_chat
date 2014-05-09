@@ -2,14 +2,14 @@
 {% load staticfiles %}
 {% block header %}
 {{ block.super }}
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script type="text/javascript" src="{% static "underscore-min.js" %}"></script>
 
  <script type="text/javascript" src="{% static "jquery.gracefulWebSocket.js" %}"></script>
  <script type="text/javascript" src="{% static "jquery.cookie.js" %}"></script>
  <script type="text/javascript">
     $(document).ready( function() {
-
+    $('.fancybox').fancybox({type: 'iframe',
+                             afterClose: function(){ parent.window.reload;}
+                            })
     function register_msg(message_id){
        var selector = '.'+message_id+' .like-message';
        $(selector).on('click', function(event) {
@@ -63,7 +63,8 @@
 
     });
  </script>
-<h1> {{ user }} </h1>
+<p> {{ user }} </p>
+<a href ='{% url 'invite_to_chat' chat.id %}' id='invite-users' class='fancybox' rel='group'>Invite users to chat </a>
 <script type="text/html" id="messageTemplate">
 
 <div data-id="<%= item.id %>" class="<%= item.id %>">

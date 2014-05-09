@@ -2,14 +2,16 @@
 {% load staticfiles %}
 {% block js %}
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="{% static "tag-it.js" %}" type="text/javascript" charset="utf-8"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
 <script type="text/javascript" src="{% static "underscore-min.js" %}"></script>
+<script type="text/javascript" src="{% static "jquery.tagsinput.js" %}"></script>
+<script type="text/javascript" src="{% static "fancybox/jquery.fancybox.js" %}"></script>
 {% endblock %}
 
 {% block css %}
-<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
-<link href="{% static "jquery.tagit.css" %} rel="stylesheet" type="text/css">
+<link href="{% static "jquery.tagsinput.css" %}" rel="stylesheet" type="text/css">
+<link href="{% static "fancybox/jquery.fancybox.css" %}" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
 {% endblock %}
 
 {% block title %}
