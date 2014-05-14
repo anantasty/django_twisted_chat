@@ -12,17 +12,34 @@ function(){
 {% endblock %}
 {% block content %}
 {{ block.super }}
-<div>
-<a href="{% url 'invite' %}" class='fancybox'> Invite some one to join</a>
-<a href="{% url 'create_chat' %}" class='fancybox chat-invite'> Create a new chat </a>
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand">FlazChat</a>
+    </div>
+    <div collapse navbar-collapse>
+      <ul class="navbar-nav nav navbar-left">
+        <li><a href="{% url 'invite' %}" class='fancybox'> Invite some one to join</a></li>
+        <li><a href="{% url 'create_chat' %}" class='fancybox chat-invite'> Create a new chat </a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/accounts/logout">logout</a></li>
+      </ul>
+    </div>
+  </div>
 </div>
-{% if chat_list %}
+<div class="container">
+  <div class="jumbotron">
+    <h3>Invited Rooms</h3>
+    {% if chat_list %}
     <ul>
-    {% for chat in chat_list %}
-        <li><a href={% url 'chat_room' chat.id %}>{{ chat.name }}</a></li>
-    {% endfor %}
+      {% for chat in chat_list %}
+      <li><a href={% url 'chat_room' chat.id %}>{{ chat.name }}</a></li>
+      {% endfor %}
     </ul>
-{% else %}
+    {% else %}
     <p>No chats are available.</p>
-{% endif %}
+    {% endif %}
+  </div>
+</div>
 {% endblock %}

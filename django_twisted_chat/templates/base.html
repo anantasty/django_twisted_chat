@@ -2,6 +2,7 @@
 {% load staticfiles %}
 
 {% block css %}
+<link href="{% static "flazchat.css" %}" rel="stylesheet" type="text/css">
 <link href="{% static "jquery.tagsinput.css" %}" rel="stylesheet" type="text/css">
 <link href="{% static "fancybox/jquery.fancybox.css" %}" rel="stylesheet" type="text/css">
 <link href="{% static "jquery-ui-timepicker-addon.css" %}" rel="stylesheet" type="text/css">
@@ -9,13 +10,6 @@
 <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
 {% endblock %}
 
-{% block title %}
-        Some Chat App
-{% endblock %}
-
-{% block header %}
-        Welcome {{ user.username }}! Chat to your heart's content :) <br/><a href="/accounts/logout">logout</a>
-{% endblock %}
 {% block js %}
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
