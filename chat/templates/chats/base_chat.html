@@ -1,9 +1,5 @@
 {% extends "chats/chat_base.html" %}
 {% load staticfiles %}
-{% block navbar-left %}
-<li><a href="{% url 'invite' %}" class='fancybox'> Invite some one to join</a></li>
-<li><a href="{% url 'create_chat' %}" class='fancybox'> Create a new chat </a></li>
-{% endblock %}
 {% block page-js %}
 <script>
 $(document).ready(function(){
@@ -15,6 +11,14 @@ $(document).ready(function(){
 {% endblock %}
 {% block page_content %}
 <div class="container">
+  <div class="navbar navbar-inverse" role="navigation">
+    <div class="container navbar-inner">
+      <ul class="navbar-nav nav">
+        <li><a href="{% url 'invite' %}" class='fancybox'> Invite some one to join</a></li>
+        <li><a href="{% url 'create_chat' %}" class='fancybox'> Create a new chat </a></li>
+      </ul>
+    </div>
+  </div>
   <div class="jumbotron">
     <h2> {{ chat.name }} </h2>
     <div class="row">

@@ -8,11 +8,25 @@
 {{ block.super }}
 <script type="text/html" id="messageTemplate">
 
-<div data-id="<%= item.id %>" class="<%= item.id %>">
-  <div class="user"><%=item.user %></div>
-  <div class="likes"><%= item.likes %></div>
-  <div class="message"><%= item.msg %></div>
-  <div class="like-message"><a href="#">LIKE</a></div>
+<div data-id="<%= item.id %>" class="<%= item.id %> panel panel-default">
+  <div class="user panel-heading"><p><%=item.user %></p></div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="message"><%= item.msg %></div>
+      </div>
+      <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-4">
+          <div class="like-message"><a href="#">LIKE</a></div>
+          </div>
+          <div class="col-md-4">
+          <div class="likes"><%= item.likes %></div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
 </div>
 </script>
 {% endblock %}
