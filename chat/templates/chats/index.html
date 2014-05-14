@@ -1,45 +1,21 @@
-{% extends "base.html" %}
-{% block page-js %}
-<script>
-$(document).ready(
-function(){
-    $('.fancybox').fancybox({type: 'iframe',
-                             onClosed: function(){parent.location.reload(true);},
-                             afterClose: function(){ parent.location.reload(true);}
-                            });
-});
-</script>
-{% endblock %}
-{% block content %}
-{{ block.super }}
-<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-  <div class="container">
-    <div class="navbar-header">
-      <a class="navbar-brand">FlazChat</a>
-    </div>
-    <div collapse navbar-collapse>
-      <ul class="navbar-nav nav navbar-left">
-        <li><a href="{% url 'invite' %}" class='fancybox'> Invite some one to join</a></li>
-        <li><a href="{% url 'create_chat' %}" class='fancybox chat-invite'> Create a new chat </a></li>
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="/accounts/logout">logout</a></li>
-      </ul>
-    </div>
-  </div>
-</div>
+{% extends "chats/chat_base.html" %}
+{% block page_content %}
 <div class="container">
   <div class="jumbotron">
+    <div class="row">
     <h3>Invited Rooms</h3>
     {% if chat_list %}
-    <ul>
+    <div class="col-sm-4">
+      <div class="list-group">
       {% for chat in chat_list %}
-      <li><a href={% url 'chat_room' chat.id %}>{{ chat.name }}</a></li>
+      <p class="list-group-item-text"><a href={% url 'chat_room' chat.id %}>{{ chat.name }}</a></p>
       {% endfor %}
-    </ul>
+      </div>
+    </div>
     {% else %}
     <p>No chats are available.</p>
     {% endif %}
   </div>
+</div>
 </div>
 {% endblock %}

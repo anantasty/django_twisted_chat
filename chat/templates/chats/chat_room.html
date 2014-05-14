@@ -1,8 +1,23 @@
 {% extends "chats/base_chat.html" %}
 {% load staticfiles %}
-{% block header %}
+{% block navbar-left %}
 {{ block.super }}
+<li><a href ='{% url 'invite_to_chat' chat.id %}' id='invite-users' class='fancybox' rel='group'>Invite users to chat </a></li>
+{% endblock %}
+{% block page_content %}
+{{ block.super }}
+<script type="text/html" id="messageTemplate">
 
+<div data-id="<%= item.id %>" class="<%= item.id %>">
+  <div class="user"><%=item.user %></div>
+  <div class="likes"><%= item.likes %></div>
+  <div class="message"><%= item.msg %></div>
+  <div class="like-message"><a href="#">LIKE</a></div>
+</div>
+</script>
+{% endblock %}
+
+{% block page-js %}
  <script type="text/javascript" src="{% static "jquery.gracefulWebSocket.js" %}"></script>
  <script type="text/javascript" src="{% static "jquery.cookie.js" %}"></script>
  <script type="text/javascript">
@@ -66,15 +81,5 @@
 
     });
  </script>
-<p> {{ user }} </p>
-<a href ='{% url 'invite_to_chat' chat.id %}' id='invite-users' class='fancybox' rel='group'>Invite users to chat </a>
-<script type="text/html" id="messageTemplate">
 
-<div data-id="<%= item.id %>" class="<%= item.id %>">
-  <div class="user"><%=item.user %></div>
-  <div class="likes"><%= item.likes %></div>
-  <div class="message"><%= item.msg %></div>
-  <div class="like-message"><a href="#">LIKE</a></div>
-</div>
-</script>
 {% endblock %}
