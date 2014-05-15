@@ -5,12 +5,15 @@
 {{ block.super }}
 
 <h1> Registeration Form </h1>
-<form action="" method="post">
-  {% csrf_token %}
-{% for field in form %}
-  {% include "chats/base_field.html" %}
-
-{% endfor %}
-<input type="submit" value="Register" />
-</form>
+<div class="well bs-component">
+  <form action="" method="post" class="form-horizontal">
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="form-group">
+      {% include "chats/base_field.html" %}
+    </div>
+    {% endfor %}
+    <input type="submit" value="Register" />
+  </form>
+</div>
 {% endblock %}
