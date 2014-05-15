@@ -2,7 +2,6 @@ import uuid
 import datetime
 import re
 
-import rethinkdb as rethink
 from redis import Redis
 
 from django.conf import settings
@@ -10,11 +9,6 @@ from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 
 from chat.models import ChatUser
-
-
-def get_rethink_conn():
-    rethink.connect(host="localhost", port=28015, db="chat").repl()
-    return rethink
 
 
 def get_redis_conn():

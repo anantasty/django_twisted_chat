@@ -1,7 +1,6 @@
 import hashlib
 import datetime
 
-import rethinkdb as rdb
 from redis import Redis
 
 from django.shortcuts import render, get_object_or_404
@@ -20,9 +19,7 @@ from chat.forms import (ChatUserForm, ChatUserInviteForm,
 from chat import utils
 
 
-rdb.connect('localhost',28015, db='chat').repl()
 redis = Redis('localhost', db=2)
-
 
 @login_required
 def index(request):

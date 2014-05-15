@@ -1,7 +1,5 @@
 import os
 
-import rethinkdb as r
-
 from twisted.application import service, internet
 from twisted.internet import reactor
 
@@ -18,13 +16,6 @@ from django.core.handlers.wsgi import WSGIHandler
 
 
 shared_messages = {}
-
-r.connect(host='localhost', port=28015).repl()
-if 'chat' not in r.db_list().run():
-    r.db_create('chat').run()
-if 'user' not in r.table_list().run():
-    r.table_create('user').run()
-
 resource = HttpChat()
 factory = Site(resource)
 ws_resource = WsParent()

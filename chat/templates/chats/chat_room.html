@@ -8,26 +8,13 @@
 {{ block.super }}
 <script type="text/html" id="messageTemplate">
 
-<div data-id="<%= item.id %>" class="<%= item.id %> panel panel-default">
-  <div class="user panel-heading"><p><%=item.user %></p></div>
-  <div class="panel-body">
-    <div class="row">
-      <div class="col-md-8">
-        <div class="message"><%= item.msg %></div>
-      </div>
-      <div class="col-md-3">
-        <div class="row">
-          <div class="col-md-4">
-          <div class="like-message"><a href="#">LIKE</a></div>
-          </div>
-          <div class="col-md-4">
-          <div class="likes"><%= item.likes %></div>
-          </div>
-        </div>
-      </div>
-      </div>
+  <div data-id="<%= item.id %>" class="<%= item.id %> row">
+    <div class="user col-md-2"><%=item.user %></div>
+    <div class="message col-md-8"><%= item.msg %></div>
+    <div class="like-message col-md-2 pull-right">
+      <a href="#">LIKE</a>
+      <span class="likes badge"><%= item.likes %></span>
     </div>
-</div>
 </script>
 {% endblock %}
 
@@ -66,6 +53,7 @@
     chat.ws.onmessage = function (event) {
       var messageFromServer = event.data;
       var list_element = document.createElement('li');
+      list_element.setAttribute('class', 'list-group-item');
       var msg = $.parseJSON(messageFromServer);
       var template = $("#messageTemplate")[0].innerHTML;
       if (msg.command){
