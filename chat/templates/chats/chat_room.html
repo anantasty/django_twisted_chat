@@ -1,39 +1,72 @@
 {% extends "chats/base_chat.html" %}
 {% load staticfiles %}
-{% block header %}
+{% block navbar-left %}
 {{ block.super }}
- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<li><a href ='{% url 'invite_to_chat' chat.id %}' id='invite-users' class='fancybox' rel='group'>Invite users to chat </a></li>
+{% endblock %}
+{% block page_content %}
+{{ block.super }}
+<script type="text/html" id="messageTemplate">
+
+  <div data-id="<%= item.id %>" class="<%= item.id %> row">
+    <div class="user col-md-2"><%=item.user %></div>
+    <div class="message col-md-8"><%= item.msg %></div>
+    <div class="like-message col-md-2 pull-right">
+      <a href="#">Hell Yeah!</a>
+      <span class="likes badge"><%= item.likes %></span>
+    </div>
+</script>
+{% endblock %}
+
+{% block page-js %}
  <script type="text/javascript" src="{% static "jquery.gracefulWebSocket.js" %}"></script>
+ <script type="text/javascript" src="{% static "jquery.cookie.js" %}"></script>
  <script type="text/javascript">
     $(document).ready( function() {
-
+    $('.fancybox').fancybox({type: 'iframe',
+                             afterClose: function(){ parent.window.reload;}
+                            });
     function register_msg(message_id){
-       var selector = '.'+message_id;
+       var selector = '.'+message_id+' .like-message';
        $(selector).on('click', function(event) {
          chat.send({command: 'like', ref: message_id, user: '{{ user }}'}); 
        });
     }
 
+    function handle_likes(message){
+      if (!message.data) {
+        return false;
+      }
+      var likes = message.data.likes;
+      $('.'+message.ref+' .likes').html(likes);
+    }
+
     window.chat = {};
-    chat.ws = $.gracefulWebSocket("ws://127.0.0.1:1025/ws");
+    chat.ws = $.gracefulWebSocket("ws://127.0.0.1:1025/ws/" + window.location.pathname.split('/')[2]);
     chat.send = function (message) {
       chat.ws.send(JSON.stringify(message));
     }
 
+    chat.ws.onopen = function (event) {
+      chat.ws.send(JSON.stringify({command: 'register_connection', user_hash: $.cookie('user_hash')}));
+    };
     chat.ws.onmessage = function (event) {
       var messageFromServer = event.data;
       var list_element = document.createElement('li');
+      list_element.setAttribute('class', 'list-group-item');
       var msg = $.parseJSON(messageFromServer);
+      var template = $("#messageTemplate")[0].innerHTML;
       if (msg.command){
        if (msg.command == 'like'){
-           list_element.innerHTML = '<a href="#" data-id='+msg.id+' class="'+msg.id+'"> Meessage:' + msg.user +' liked your post</a>';
+           handle_likes(msg);
          }
       }
       else{
-        list_element.innerHTML = '<a href="#" data-id='+msg.id+' class="'+msg.id+'"> Meessage:' + msg.msg +'</a>';
+        
+        list_element.innerHTML = _.template(template, {item: msg});
+        $("#message_list ul").append(list_element);
+        register_msg(msg.id);
       }
-      $("#message_list ul").append(list_element);
-      register_msg(msg.id);
     };
 
     var inputBox = document.getElementById("inputbox");
@@ -50,5 +83,5 @@
 
     });
  </script>
-<h1> {{ user }} </h1>
+
 {% endblock %}

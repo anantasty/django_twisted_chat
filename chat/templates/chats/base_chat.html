@@ -1,11 +1,36 @@
-{% extends "base.html" %}
-
-{% block content %}
-{{ block.super }}
-<h1> {{ chat.name }} </h1>
-<div id="message_list">
-  <ul>
-  </ul>
+{% extends "chats/chat_base.html" %}
+{% load staticfiles %}
+{% block page-js %}
+<script>
+$(document).ready(function(){
+    $('.fancybox').fancybox({type: 'iframe',
+                             afterClose: function(){ parent.window.reload;}
+                            });
+});
+</script>
+{% endblock %}
+{% block page_content %}
+<div class="container">
+  <div class="navbar navbar-inverse" role="navigation">
+    <div class="container navbar-inner">
+      <ul class="navbar-nav nav">
+        <li><a href="{% url 'invite' %}" class='fancybox'> Invite some one to join</a></li>
+        <li><a href="{% url 'create_chat' %}" class='fancybox'> Create a new chat </a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="jumbotron">
+    <h2> {{ chat.name }} </h2>
+    <div>
+      <div id="message_list" class="bs-component">
+        <ul class="list-group chat-list">
+        </ul>
+      </div>
+    </div>
+    <div class="form-group">
+      <textarea name="term" id="inputbox" cols="40" rows="4" class="form-control input-lg"></textarea>
+    </div>
+  </div>
 </div>
-<textarea name="term" id="inputbox" cols="40" rows="4"></textarea>
+
 {% endblock %}

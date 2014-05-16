@@ -1,5 +1,8 @@
 <html>
     <head>
+        {% block css %}
+        {% endblock %}
+
         {% block header %}
         {% endblock %}
         <title>{% block title %}{% endblock %}</title>
@@ -9,5 +12,9 @@
         {% block content %}
         {% endblock %}
         <!-- footer -->
+        {% block js %}
+        {% endblock %}
+        {% block page-js %}
+        {% endblock %}
     </body>
 </html>

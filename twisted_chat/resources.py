@@ -6,15 +6,32 @@ from twisted.internet import task
 from twisted.web.resource import Resource
 from twisted.web.static import File
 from twisted.web.server import NOT_DONE_YET
+from twisted.web.websockets import WebSocketsResource, lookupProtocolForFactory
 
 from twisted_chat.factories import ChatFactory
+
+
+class WsParent(Resource):
+    def __init__(self):
+        self.wsFactory = ChatFactory
+        self.factories = {}
+
+    def getChild(self, name, request):
+        factory = self.factories.get(name)
+        if not factory:
+            factory = self.wsFactory(name)
+            self.factories[name] = factory
+        return WebSocketsResource(lookupProtocolForFactory(factory))
+
+    def getChildWithDefault(self, path, request):
+        return self.getChild(path, request)
 
 
 class HttpChat(Resource):
     #optimization 
     isLeaf = True
     messages = {}
-    def __init__(self, messages = None):
+    def __init__(self,messages = None):
         # throttle in seconds to check app for new data
         self.throttle = 1
         # define a list to store client requests
@@ -112,6 +129,7 @@ class StaticFileScanner(Resource):
         Resource.__init__(self)
     
     def getChild(self, *args):
+        print 'args: {}, dirs: {}'.format(args, self.dirs)
         for d in self.dirs:
             if d.getChild(*args) != d.childNotFound:
                 return d.getChild(*args)

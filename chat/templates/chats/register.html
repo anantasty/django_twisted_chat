@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{{ block.super }}
+
+<h1> Registeration Form </h1>
+<div class="well bs-component">
+  <form action="" method="post" class="form-horizontal">
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="form-group">
+      {% include "chats/base_field.html" %}
+    </div>
+    {% endfor %}
+    <input type="submit" value="Register" />
+  </form>
+</div>
+{% endblock %}

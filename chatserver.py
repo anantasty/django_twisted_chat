@@ -8,20 +8,17 @@ from twisted.web.resource import Resource
 from twisted.web.server import Site
 from twisted.web.websockets import WebSocketsResource, lookupProtocolForFactory
 
-from twisted_chat.factories import ChatFactory
-from twisted_chat.resources import HttpChat, StaticFileScanner
+from twisted_chat.resources import HttpChat, StaticFileScanner, WsParent
 from twisted_chat.wsgi import WsgiRoot
 from twisted.python.threadpool import ThreadPool
 
 from django.core.handlers.wsgi import WSGIHandler
 
 
-
 shared_messages = {}
-
-resource = HttpChat(shared_messages)
+resource = HttpChat()
 factory = Site(resource)
-ws_resource = WebSocketsResource(lookupProtocolForFactory(resource.wsFactory))
+ws_resource = WsParent()
 
 root = Resource()
 root.putChild("",resource) #the http protocol is up at /

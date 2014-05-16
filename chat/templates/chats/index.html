@@ -1,14 +1,21 @@
-{% extends "base.html" %}
-
-{% block content %}
-{{ block.super }}
-{% if chat_list %}
-    <ul>
-    {% for chat in chat_list %}
-        <li><a href={% url 'chat_room' chat.id %}>{{ chat.name }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
+{% extends "chats/chat_base.html" %}
+{% block page_content %}
+<div class="container">
+  <div class="jumbotron">
+    <div class="row">
+    <h3>Invited Rooms</h3>
+    {% if chat_list %}
+    <div class="col-sm-4">
+      <div class="list-group">
+      {% for chat in chat_list %}
+      <p class="list-group-item-text"><a href={% url 'chat_room' chat.id %}>{{ chat.name }}</a></p>
+      {% endfor %}
+      </div>
+    </div>
+    {% else %}
     <p>No chats are available.</p>
-{% endif %}
+    {% endif %}
+  </div>
+</div>
+</div>
 {% endblock %}
