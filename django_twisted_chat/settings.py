@@ -130,6 +130,8 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'chat',
     # 'django.contrib.admindocs',
+    #third party apps
+    'widget_tweaks',
 )
 
 # A sample logging configuration. The only tangible logging

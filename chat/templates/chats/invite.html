@@ -4,13 +4,17 @@
 
 {{ block.super }}
 
-<h1> Invite a friend </h1>
-<form action="" method="post">
+<div class="well bs-component">
+<form action="" method="post" class="form-horizontal">
   {% csrf_token %}
+<fieldset>
+<legend>Invite a friend</legend>
 {% for field in form %}
   {% include "chats/base_field.html" %}
 
 {% endfor %}
-<input type="submit" value="Send message" />
+<button type="submit" class="btn btn-primary">Send message</button>
+</fieldset>
 </form>
+</div>
 {% endblock %}
