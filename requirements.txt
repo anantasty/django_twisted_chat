@@ -1,8 +1,7 @@
 Django==1.5.2
 Twisted==13.1.0
-
 rethinkdb
 simplejson
 redis
-
-npm install underscore
+django-widget-tweaks
+#npm install underscore

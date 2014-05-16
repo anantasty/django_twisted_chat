@@ -9,10 +9,12 @@ from chat import constants
 class WebsocketChat(basic.LineReceiver):
     def connectionMade(self):
         self.message({'command': 'connected'})
+        self.message({'msg': str(self.factory.client_map.keys()), 'likes': 0, 'command': None, 'user': 'anant1'})
         self.factory.clients.append(self)
 
     def connectionLost(self, reason):
         self.factory.clients.remove(self)
+        del self.factory.client_map[self.user]
 
     def _handle_likes(self, message):
         ref = message['ref']
@@ -35,6 +37,7 @@ class WebsocketChat(basic.LineReceiver):
                 message.get('user_hash')),
                                'user')
         self.factory.client_map[user] = self
+        self.user = user
 
     def command_handler(self, message):
         if not message.get('command'):
