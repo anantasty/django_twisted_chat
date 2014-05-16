@@ -1,0 +1,14 @@
+body {
+  padding-top: 70px;
+  padding-bottom: 30px;
+}
+
+.chat-list .list-group-item{
+    margin-bottom: 5px;
+    border-radius: 20px;
+}
+
+.chat-list{
+    max-height: 70%;
+    overflow-y: auto;
+}
