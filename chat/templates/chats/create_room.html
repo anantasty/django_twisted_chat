@@ -1,14 +1,5 @@
 {% extends "base.html" %}
-{% block page-js %}
-<script>
-$(document).ready(
-    function(){
-        $('#id_end_time').datetimepicker();
-        $('#id_start_time').datetimepicker();
-    }
-);
-</script>
-{% endblock %}
+
 {% block content %}
 
 {{ block.super }}
@@ -26,7 +17,14 @@ $(document).ready(
   </form>
 </div>
 {% endblock %}
+{% block page-js %}
 <script>
+$(document).ready(
+    function(){
+        $('#id_end_time').datetimepicker();
+        $('#id_start_time').datetimepicker();
+    }
+);
 $(document).ready(function(){
     $('#id_users').tagsInput({
         height: '40px',
@@ -34,3 +32,4 @@ $(document).ready(function(){
     });
 });
 </script>
+{% endblock %}

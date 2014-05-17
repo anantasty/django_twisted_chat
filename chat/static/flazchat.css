@@ -17,6 +17,12 @@ body {
     height: 30%;
 }
 
-#id_user{
+#field_users{
     height: 30%;
+}
+
+.masthead{
+    height://height of bg;
+    background-image:url("images/logo.png");
+    background-repeat:no-repeat;
 }

@@ -9,14 +9,14 @@
     </div>
     <div collapse navbar-collapse>
       <ul class="nav nav-pills navbar-left">
-        <li><a href="{% url 'invite' %}" class='fancybox'> Invite some one to join</a></li>
-        <li><a href="{% url 'create_chat' %}" class='fancybox chat-invite'> Create a new chat </a></li>
+        <li><a href="{% url 'invite' %}" class='fancybox'> Invite to Flazchat</a></li>
+        <li><a href="{% url 'create_chat' %}" class='fancybox chat-invite'> Create Flazchat </a></li>
         {% block navbar-left %}{% endblock %}
       </ul>
       <ul class="nav nav-pills navbar-right">
         {% block navbar-right %}{% endblock %}
         <li><a href="{% url 'change_password' %}" class="fancybox">Set Password</a></li>
-        <li><a href="/accounts/logout">logout</a></li>
+        <li><a href="/accounts/logout">Logout</a></li>
       </ul>
     </div>
   </div>
