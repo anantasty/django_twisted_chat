@@ -18,5 +18,7 @@ urlpatterns = patterns('',
             name='friends_autocomplete'),
         url(r'^join_chat/(?P<uid>\w+)/$',
             views.JoinChat.as_view(), name='join_chat'),
+        url(r'^change_password/$',
+            views.ChangePasswordView.as_view(), name='change_password'),
         url(r'^thanks', views.thanks, name='thanks'),
 )

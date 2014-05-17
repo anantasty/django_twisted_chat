@@ -195,3 +195,13 @@ def friends_autocomplete(request):
 
     return HttpResponse(simplejson.dumps(friends_list),
                         mimetype='application/json')
+
+
+class ChangePasswordView(mixins.LoginRequiredMixin, FormView):
+    template_name = 'chats/change_password.html'
+    form_class = ChangePasswordForm
+
+    def form_valid(self, form):
+        user = self.request.user
+        user.set_password(form.cleaned_data.get('password1'))
+        return HttpResponse('Password change successful.')
