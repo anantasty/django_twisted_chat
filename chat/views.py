@@ -4,8 +4,10 @@ import datetime
 from redis import Redis
 
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.views.generic.edit import FormView
+from django.views.generic import View
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.db.models import Q
@@ -78,8 +80,8 @@ class RegisterationView(FormView):
             constants.EMAIL_INVITED_TO.format(user.email))
         for chat in invited_chats:
             redis.sadd(constants.CHAT_INVITED_USERS.format(chat),
-                       user.usernames)
-            redis.sadd(constants.USER_INVITED_TO.format(user.username), chat)
+                       user.pk)
+            redis.sadd(constants.USER_INVITED_TO.format(user.pk), chat)
         return super(RegisterationView, self).form_valid(form)
 
 
@@ -127,39 +129,50 @@ class CreateRoom(mixins.LoginRequiredMixin, FormView):
                 days=7)
         chat_room.save()
         url = reverse('invite_to_chat', kwargs={'chat': chat_room.id})
-        return HttpResponse('Chat created sucessfully')
+        return HttpResponseRedirect(url)
 
 
 class ChatInviteView(mixins.LoginRequiredMixin, FormView):
     template_name = 'chats/invite_to_chat.html'
     form_class = InviteToChatForm
 
+    def invite_users(self, chat, users):
+        for user in users:
+            invite_hash = utils.create_user_invite_link(user)
+            redis.hmset(constants.USER_INVITE_HASH.format(invite_hash),
+                        {'user': user.pk,
+                         'chat': chat.pk,
+                         'chat_start': chat.start_time,
+                         'chat_end': chat.end_time})
+            utils.send_user_invite_email(user.email, chat, invite_hash,
+                                         self.request)
+
     def form_valid(self, form):
         invitees = form.cleaned_data['users'].split(',')
-        chat = form.cleaned_data.get('chat')
+        chat = ChatRoom.objects.get(pk=form.cleaned_data.get('chat'))
         users = ChatUser.objects.filter(username__in=invitees)
-        usernames = [user.username for user in users]
-        not_found = set(invitees) - set(usernames)
+        not_found = set(invitees) - set([user.email for user in users])
         emails = [email for email in not_found if utils.validate_email(email)]
-        print emails
-        redis.sadd(constants.CHAT_INVITED_USERS.format(chat), *usernames)
-        for username in usernames:
-            redis.sadd(constants.USER_INVITED_TO.format(username), chat)
-        if not_found:
-            redis.sadd(constants.CHAT_INVITED_EMAILS.format(chat), *not_found)
-            for invitee_email in not_found:
-                redis.sadd(constants.EMAIL_INVITED_TO.format(invitee_email),
-                           chat)
-                utils.quick_user_invite_handler(invitee_email,
-                                                self.request.user.email,
-                                                    self.request)
+        new_users = utils.quick_create_users(emails)
+        self.invite_users(chat, list(users) + new_users)
         return HttpResponseRedirect(reverse('chat_room',
-                                            kwargs={'chat_room_id': chat}))
+                                            kwargs={'chat_room_id': chat.pk}))
 
     def get_form(self, form_class):
         form = super(ChatInviteView, self).get_form(form_class)
         form.set_user(self.request.user)
         return form
+
+
+class JoinChat(View):
+    def get(self, request, uid=None):
+        uid = self.kwargs.get('uid')
+        invite_dict = redis.hgetall(constants.USER_INVITE_HASH.format(uid))
+        user = ChatUser.objects.get(pk=invite_dict['user'])
+        user.backend = 'django.contrib.auth.backends.ModelBackend'
+        login(request, user)
+        url = reverse('chat_room', kwargs={'chat_room_id': invite_dict['chat']})
+        return HttpResponseRedirect(url)
 
 
 @login_required
@@ -173,9 +186,12 @@ def friends_autocomplete(request):
                                                Q(email__startswith=query))
     else:
         matching_friends = user.friends.all()
+    friends_list = []
+    for friend in matching_friends:
+        name = '{} {}'.format(friend.first_name, friend.last_name) if \
+          friend.first_name and friend.last_name else friend.email
+        friends_list.append({'id': friend.id, 'label': name,
+                             'value': friend.email})
 
-    friends_list = [{'id': friend.pk, 'label': '{} {}'.format(
-        friend.first_name, friend.last_name), 'value': friend.username}
-        for friend in matching_friends]
     return HttpResponse(simplejson.dumps(friends_list),
                         mimetype='application/json')

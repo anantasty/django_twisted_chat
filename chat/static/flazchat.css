@@ -12,3 +12,7 @@ body {
     max-height: 70%;
     overflow-y: auto;
 }
+
+.user_input{
+    height: 30%;
+}

@@ -16,5 +16,7 @@ urlpatterns = patterns('',
             views.ChatInviteView.as_view(), name='invite_to_chat'),
         url(r'^friends_autocomplete/$', views.friends_autocomplete,
             name='friends_autocomplete'),
+        url(r'^join_chat/(?P<uid>\w+)/$',
+            views.JoinChat.as_view(), name='join_chat'),
         url(r'^thanks', views.thanks, name='thanks'),
 )

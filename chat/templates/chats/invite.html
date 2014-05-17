@@ -10,11 +10,30 @@
 <fieldset>
 <legend>Invite a friend</legend>
 {% for field in form %}
-  {% include "chats/base_field.html" %}
+{% load widget_tweaks %}
+    <div class="form-group {% if field.field.required %} required{% endif %}{% if field.errors %} error{% endif %}" id="field_{{ field.name }}">
+        {% block field-label %}
+            <label class="control-label col-lg-2" for="id_{{ field.name }}">{{ field.label }}{% if field.field.required %} <i class="fa fa-cog fa-sm required"></i>{% endif %}{% if help_tip %} <span class="info" rel="tooltip" title="{{ help_t\
+ip }}"><i class="fa fa-question-circle"></i></span>{% endif %}</label>
+        {% endblock %}
+
+        <div class="col-lg-8 user_input">
+            {% block field-input %}
+                {{ field | add_class:"form-control"}}
+            {% endblock %}
+        </div>
+    </div>
 
 {% endfor %}
 <button type="submit" class="btn btn-primary">Send message</button>
 </fieldset>
 </form>
 </div>
+{% endblock %}
+{% block page-js %}
+<script>
+$(document).ready(function(){
+    $('#id_users').tagsInput({'height': '90px'});
+});
+</script>
 {% endblock %}

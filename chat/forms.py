@@ -7,46 +7,24 @@ from chat.models import ChatUser, ChatRoom
 
 class ChatUserForm(UserCreationForm):
     email = forms.EmailField(required=True)
-    user_intro = forms.CharField()
 
     class Meta:
         model = ChatUser
-        fields = ('first_name', 'last_name', 'username', 'email', 'password1',
-                  'password2', 'user_intro', 'email')
+        fields = ('username', 'email', 'password1',
+                  'password2')
+        exclude = ('user_intro', 'score')
 
     def save(self, commit=True):
         user = super(UserCreationForm, self).save(commit=False)
         user.email = self.cleaned_data['email']
-        user.user_intro = self.cleaned_data['user_intro']
         user.set_password(self.cleaned_data['password1'])
         if commit:
             user.save()
         return user
 
 
-class ChatUserInviteForm(ChatUserForm):
-    def __init__(self, *args, **kwargs):
-        super(ChatUserInviteForm, self).__init__(*args, **kwargs)
-        del self.fields['password1']
-        del self.fields['password2']
-
-
-    score = forms.FloatField(validators=[MinValueValidator(1),
-                                         MaxValueValidator(4)])
-
-    class Meta:
-        model = ChatUser
-        fields = ('first_name', 'last_name', 'username', 'email', 'user_intro',
-                  'email', 'score')
-
-    def save(self, commit=True):
-
-        user = super(UserCreationForm, self).save(commit=False)
-        user.email = self.cleaned_data['email']
-        user.user_intro = self.cleaned_data['user_intro']
-        if commit:
-            user.save()
-        return user
+class ChatUserInviteForm(forms.Form):
+    users = forms.CharField(required=False)
 
 
 class ChangePasswordForm(forms.Form):
