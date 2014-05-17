@@ -93,10 +93,11 @@ class UserInvitationView(mixins.LoginRequiredMixin, RegisterationView):
         return reverse('index')
 
     def form_valid(self, form):
-        user = form.save(commit=False)
-        user.referral_user = self.request.user.chatuser
-        user.save()
-        utils.user_invite_handler(user, self.request)
+        users = utils.users_list_from_str(form.cleaned_data['users'],
+                                               self.request.user.chatuser,
+                                               new_only=True)
+        for user in users:
+            utils.user_invite_handler(user, self.request)
         return HttpResponse('User has been invited')
 
 
@@ -124,10 +125,15 @@ class CreateRoom(mixins.LoginRequiredMixin, FormView):
     def form_valid(self, form):
         chat_room = form.save(commit=False)
         chat_room.created_by = self.request.user.chatuser
+        if not chat_room.start_time:
+            chat_room.start_time = datetime.datetime.now()
         if not chat_room.end_time:
             chat_room.end_time = datetime.datetime.now() + datetime.timedelta(
                 days=7)
         chat_room.save()
+        users_list = utils.users_list_from_str(form.cleaned_data.get('users'),
+                                               self.request.user.chatuser)
+        utils.invite_users(chat_room, users_list, self.request)
         url = reverse('invite_to_chat', kwargs={'chat': chat_room.id})
         return HttpResponseRedirect(url)
 
@@ -137,7 +143,8 @@ class ChatInviteView(mixins.LoginRequiredMixin, FormView):
     form_class = InviteToChatForm
 
     def form_valid(self, form):
-        users_list = utils.users_list_from_str(form.cleaned_data['users'])
+        users_list = utils.users_list_from_str(form.cleaned_data['users'],
+                                               self.request.user.chatuser)
         chat = ChatRoom.objects.get(pk=form.cleaned_data.get('chat'))
         utils.invite_users(chat, users_list, self.request)
         return HttpResponseRedirect(reverse('chat_room',
@@ -153,6 +160,7 @@ class JoinChat(View):
     def get(self, request, uid=None):
         uid = self.kwargs.get('uid')
         invite_dict = redis.hgetall(constants.USER_INVITE_HASH.format(uid))
+        print invite_dict
         user = ChatUser.objects.get(pk=invite_dict['user'])
         user.backend = 'django.contrib.auth.backends.ModelBackend'
         login(request, user)
@@ -165,12 +173,12 @@ def friends_autocomplete(request):
     user = request.user.chatuser
     query = request.GET.get('query')
     if query:
-        matching_friends = user.friends.filter(Q(username__startswith=query) |
+        matching_friends = user.objects.filter(Q(username__startswith=query) |
                                                Q(first_name__startswith=query) |
                                                Q(last_name__startswith=query) |
                                                Q(email__startswith=query))
     else:
-        matching_friends = user.friends.all()
+        matching_friends = user.all()
     friends_list = []
     for friend in matching_friends:
         name = '{} {}'.format(friend.first_name, friend.last_name) if \

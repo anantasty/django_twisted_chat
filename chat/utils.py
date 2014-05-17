@@ -59,10 +59,11 @@ def send_user_invite_email(email, chat, invite_hash, request):
     send_mail(subject, message, from_email, [email])
 
 
-def quick_create_users(emails):
+def quick_create_users(emails, creating_user):
     users = []
     for email in emails:
         user = ChatUser(email=email, username=email)
+        user.referral_user = creating_user
         user.save()
         users.append(user)
     return users
@@ -85,7 +86,7 @@ def validate_email(email):
 
 
 
-def invite_users(self, chat, users, request):
+def invite_users(chat, users, request):
     redis = get_redis_conn()
     for user in users:
         invite_hash = create_user_invite_link(user)
@@ -98,10 +99,12 @@ def invite_users(self, chat, users, request):
                                request)
 
 
-def users_list_from_str(user_str):
+def users_list_from_str(user_str, creating_user, new_only=False):
     invitees = user_str.split(',')
     users = ChatUser.objects.filter(username__in=invitees)
     not_found = set(invitees) - set([user.email for user in users])
     emails = [email for email in not_found if validate_email(email)]
-    new_users = quick_create_users(emails)
+    new_users = quick_create_users(emails, creating_user)
+    if new_only:
+        return new_users
     return list(users) + new_users

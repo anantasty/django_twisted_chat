@@ -22,7 +22,8 @@ body {
 }
 
 .masthead{
-    height://height of bg;
-    background-image:url("images/logo.png");
+    height: 170px;
+    width: 180px;
+    background-image:url("images/logo180.png");
     background-repeat:no-repeat;
 }

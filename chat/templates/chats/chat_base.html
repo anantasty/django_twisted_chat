@@ -2,7 +2,8 @@
 {% block content %}
 {{ block.super }}
 {% block navbar-content %}
-<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+<div class="masthead container"></div>
+<div class="navbar navbar-default " role="navigation">
   <div class="container">
     <div class="navbar-header">
       <a class="navbar-brand">FlazChat</a>
@@ -15,7 +16,7 @@
       </ul>
       <ul class="nav nav-pills navbar-right">
         {% block navbar-right %}{% endblock %}
-        <li><a href="{% url 'change_password' %}" class="fancybox">Set Password</a></li>
+          <li><a href="{% url 'change_password' %}" class="fancybox">Set Password</a></li>
         <li><a href="/accounts/logout">Logout</a></li>
       </ul>
     </div>
