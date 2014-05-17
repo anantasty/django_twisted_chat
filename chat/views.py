@@ -21,7 +21,7 @@ from chat.forms import (ChatUserForm, ChatUserInviteForm,
 from chat import utils
 
 
-redis = Redis('localhost', db=2)
+redis = utils.get_redis_conn()
 
 @login_required
 def index(request):
@@ -134,8 +134,7 @@ class CreateRoom(mixins.LoginRequiredMixin, FormView):
         users_list = utils.users_list_from_str(form.cleaned_data.get('users'),
                                                self.request.user.chatuser)
         utils.invite_users(chat_room, users_list, self.request)
-        url = reverse('invite_to_chat', kwargs={'chat': chat_room.id})
-        return HttpResponseRedirect(url)
+        return HttpResponse('Chat created sucessfully')
 
 
 class ChatInviteView(mixins.LoginRequiredMixin, FormView):
@@ -145,22 +144,16 @@ class ChatInviteView(mixins.LoginRequiredMixin, FormView):
     def form_valid(self, form):
         users_list = utils.users_list_from_str(form.cleaned_data['users'],
                                                self.request.user.chatuser)
-        chat = ChatRoom.objects.get(pk=form.cleaned_data.get('chat'))
+        chat = ChatRoom.objects.get(pk=self.kwargs.get('chat'))
         utils.invite_users(chat, users_list, self.request)
-        return HttpResponseRedirect(reverse('chat_room',
-                                            kwargs={'chat_room_id': chat.pk}))
-
-    def get_form(self, form_class):
-        form = super(ChatInviteView, self).get_form(form_class)
-        form.set_user(self.request.user)
-        return form
+        return HttpResponse('User invited sucessfully')
 
 
 class JoinChat(View):
     def get(self, request, uid=None):
         uid = self.kwargs.get('uid')
         invite_dict = redis.hgetall(constants.USER_INVITE_HASH.format(uid))
-        print invite_dict
+        print uid, invite_dict, constants.USER_INVITE_HASH.format(uid)
         user = ChatUser.objects.get(pk=invite_dict['user'])
         user.backend = 'django.contrib.auth.backends.ModelBackend'
         login(request, user)
@@ -171,14 +164,14 @@ class JoinChat(View):
 @login_required
 def friends_autocomplete(request):
     user = request.user.chatuser
-    query = request.GET.get('query')
+    query = request.GET.get('term')
     if query:
-        matching_friends = user.objects.filter(Q(username__startswith=query) |
+        matching_friends = ChatUser.objects.filter(Q(username__startswith=query) |
                                                Q(first_name__startswith=query) |
                                                Q(last_name__startswith=query) |
                                                Q(email__startswith=query))
     else:
-        matching_friends = user.all()
+        matching_friends = ChatUser.objects.all()
     friends_list = []
     for friend in matching_friends:
         name = '{} {}'.format(friend.first_name, friend.last_name) if \

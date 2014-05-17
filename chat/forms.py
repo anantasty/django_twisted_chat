@@ -40,19 +40,5 @@ class ChatRoomForm(forms.ModelForm):
 
 
 class InviteToChatForm(forms.Form):
-    CHATS = [(room.pk, room.name) for room in ChatRoom.objects.all()]
-    chat = forms.ChoiceField(choices=CHATS)
     users = forms.CharField(required=False)
 
-    def __init__(self, *args, **kwargs):
-        super(InviteToChatForm, self).__init__(*args, **kwargs)
-        if 'user' in kwargs:
-            user = kwargs.get('user')
-            CHATS = [(room.pk, room.name) for room in ChatRoom.objects.filter(
-                created_by=user)]
-            self.fields['chat'] = forms.ChoiceField(choices=CHATS)
-
-    def set_user(self, user):
-        CHATS = [(room.pk, room.name) for room in ChatRoom.objects.filter(
-            created_by=user)]
-        self.fields['chat'] = forms.ChoiceField(choices=CHATS)

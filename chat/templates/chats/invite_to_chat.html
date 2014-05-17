@@ -4,15 +4,21 @@
 {{ block.super }}
 
 <h1> Invite To Chat </h1>
-<form action="" method="post" class="form-horizontal">
-  {% csrf_token %}
-{% for field in form %}
-  {% include "chats/base_field.html" %}
-
-{% endfor %}
-
-<input type="submit" value="Invite" />
-</form>
+<div class="well bs-component">
+  <form action="" method="post" class="form-horizontal">
+    {% csrf_token %}
+    {% for field in form %}
+    {% include "chats/base_field.html" %}
+    
+    {% endfor %}
+    
+    <div class="form-group row ">
+      <div class="col-lg-8">
+      <button type="submit" class="btn btn-primary">Invite</button>
+      </div>
+    </div>
+  </form>
+</div>
 {% endblock %}
 
 {% block page-js %}

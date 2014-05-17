@@ -13,17 +13,28 @@ body {
     overflow-y: auto;
 }
 
-.user_input{
-    height: 30%;
-}
-
-#field_users{
-    height: 30%;
-}
-
-.masthead{
+.logo-large{
     height: 170px;
     width: 180px;
     background-image:url("images/logo180.png");
     background-repeat:no-repeat;
+}
+
+.logo-small{
+    height: 60px;
+    width: 60px;
+    background-image:url("images/logo60.png");
+    background-repeat:no-repeat;
+}
+
+.navbar-default{
+    background-color: #CF1414;
+}
+
+.btn-primary{
+    background-color: #CF1414;
+}
+
+.navbar-inverse{
+    background-color: #CF1414;
 }
