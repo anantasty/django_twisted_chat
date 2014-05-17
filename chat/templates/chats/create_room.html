@@ -26,3 +26,11 @@ $(document).ready(
   </form>
 </div>
 {% endblock %}
+<script>
+$(document).ready(function(){
+    $('#id_users').tagsInput({
+        height: '40px',
+        autocomplete_url:'{% url "friends_autocomplete" %}'
+    });
+});
+</script>

@@ -33,6 +33,7 @@ class ChangePasswordForm(forms.Form):
 
 
 class ChatRoomForm(forms.ModelForm):
+    users = forms.CharField(required=False)
     class Meta:
         model = ChatRoom
         widgets = {'created_by': forms.HiddenInput()}

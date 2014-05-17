@@ -9,6 +9,7 @@ from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 
 from chat.models import ChatUser
+from chat import constants
 
 
 def get_redis_conn():
@@ -81,3 +82,26 @@ def validate_email(email):
         if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", email) != None:
             return True
     return False
+
+
+
+def invite_users(self, chat, users, request):
+    redis = get_redis_conn()
+    for user in users:
+        invite_hash = create_user_invite_link(user)
+        redis.hmset(constants.USER_INVITE_HASH.format(invite_hash),
+            {'user': user.pk,
+             'chat': chat.pk,
+             'chat_start': chat.start_time,
+             'chat_end': chat.end_time})
+        send_user_invite_email(user.email, chat, invite_hash,
+                               request)
+
+
+def users_list_from_str(user_str):
+    invitees = user_str.split(',')
+    users = ChatUser.objects.filter(username__in=invitees)
+    not_found = set(invitees) - set([user.email for user in users])
+    emails = [email for email in not_found if validate_email(email)]
+    new_users = quick_create_users(emails)
+    return list(users) + new_users

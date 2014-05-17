@@ -136,25 +136,10 @@ class ChatInviteView(mixins.LoginRequiredMixin, FormView):
     template_name = 'chats/invite_to_chat.html'
     form_class = InviteToChatForm
 
-    def invite_users(self, chat, users):
-        for user in users:
-            invite_hash = utils.create_user_invite_link(user)
-            redis.hmset(constants.USER_INVITE_HASH.format(invite_hash),
-                        {'user': user.pk,
-                         'chat': chat.pk,
-                         'chat_start': chat.start_time,
-                         'chat_end': chat.end_time})
-            utils.send_user_invite_email(user.email, chat, invite_hash,
-                                         self.request)
-
     def form_valid(self, form):
-        invitees = form.cleaned_data['users'].split(',')
+        users_list = utils.users_list_from_str(form.cleaned_data['users'])
         chat = ChatRoom.objects.get(pk=form.cleaned_data.get('chat'))
-        users = ChatUser.objects.filter(username__in=invitees)
-        not_found = set(invitees) - set([user.email for user in users])
-        emails = [email for email in not_found if utils.validate_email(email)]
-        new_users = utils.quick_create_users(emails)
-        self.invite_users(chat, list(users) + new_users)
+        utils.invite_users(chat, users_list, self.request)
         return HttpResponseRedirect(reverse('chat_room',
                                             kwargs={'chat_room_id': chat.pk}))
 
