@@ -6,3 +6,5 @@ USER_INVITED_TO = 'User:Invitedto:{}'
 EMAIL_INVITED_TO = 'Email:Inviteedto:{}'
 
 USER_INVITE_HASH = 'UserInviteHash:{}'
+
+INVITE_HASH = 'InviteHash:{}'

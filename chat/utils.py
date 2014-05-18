@@ -19,8 +19,9 @@ def get_redis_conn():
 def create_user_invite_link(user):
     uid = uuid.uuid1().hex
     redis = get_redis_conn()
-    redis.hmset('InviteHash:{}'.format(uid),
-                     {'username': user.username, 'attempts': 0,
+    redis.hmset(constants.INVITE_HASH.format(uid),
+                     {'username': user.username,
+                      'attempts': 0,
                       'created_at': datetime.datetime.now().isoformat(),
                       'user_pk': user.pk})
     return uid
@@ -29,7 +30,7 @@ def create_user_invite_link(user):
 def user_invite_handler(user, request):
     invite_hash = create_user_invite_link(user)
     subject = '{}! Invitation to sign up for flazchat.com'.format(
-        user.first_name)
+        user.email)
     url = request.build_absolute_uri(reverse('invite_accept',
                                              kwargs={'uid': invite_hash}))
     message = "{} You have been invited to sign up for..{}".format(
@@ -70,8 +71,8 @@ def quick_create_users(emails, creating_user):
 
 def set_password(uid, password):
     redis = get_redis_conn()
-    username = redis.hget(uid, 'username')
-    redis.hincrby(uid, 'attempts')
+    username = redis.hget(constants.INVITE_HASH.format(uid), 'username')
+    redis.hincrby(constants.INVITE_HASH.format(uid), 'attempts')
     user = ChatUser.objects.get(username=username)
     user.set_password(password)
     user.save(

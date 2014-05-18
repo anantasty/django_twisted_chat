@@ -7,12 +7,11 @@ from twisted.internet.protocol import Factory
 
 from twisted_chat.protocols import WebsocketChat
 
-
 class ChatFactory(Factory):
     protocol = WebsocketChat
 
     def __init__(self, *args, **kwargs):
-        self.redis = Redis(host='localhost', db=2)
+        self.redis = Redis(host='localhost', db=1)
         self.clients = []
         self.messages = {}
         self.chat_id = str(uuid.uuid1())
