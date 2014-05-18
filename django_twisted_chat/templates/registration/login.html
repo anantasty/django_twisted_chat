@@ -2,39 +2,43 @@
 {% load widget_tweaks %}
 
 {% block content %}
-<div class="container bs-docs-section">
-<div class="row">
-<div class="col-lg-6">
-  <div class="well bs-component">
-    
-    <form method="post" action="{% url 'django.contrib.auth.views.login' %}" class="form-horizontal">
-      <fieldset>
-        <legend>
-          Login
-          {% if form.errors %}
-          <p>Your username and password didn't match. Please try again.</p>
-          {% endif %}
-        </legend>
-        {% csrf_token %}
-        <div class="form-group">
-          <label for="id_username" class="col-lg-2 control-label">Username:</label>
-          <div class="col-lg-10">
-            {{ form.username | add_class:"form-control"}}
-          </div>
-        </div>
-      <div class="form-group">
-        <label for="id_password" class="col-lg-2 control-label">Password:</label>
-        <div class="col-lg-10">
-          {{ form.password | add_class:"form-control"}}
+<div class="jumbotron">
+  <div class="logo-large container"></div>
+  <div class="container center"><h2>Welcome to Flazchat</h2></div>
+  <div class="container bs-docs-section">
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="well bs-component">
+          
+          <form method="post" action="{% url 'django.contrib.auth.views.login' %}" class="form-horizontal">
+            <fieldset>
+              <legend>
+                Login
+                {% if form.errors %}
+                <p>Your username and password didn't match. Please try again.</p>
+                {% endif %}
+              </legend>
+              {% csrf_token %}
+              <div class="form-group">
+                <label for="id_username" class="col-lg-2 control-label">Username:</label>
+                <div class="col-lg-10">
+                  {{ form.username | add_class:"form-control"}}
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="id_password" class="col-lg-2 control-label">Password:</label>
+                <div class="col-lg-10">
+                  {{ form.password | add_class:"form-control"}}
+                </div>
+              </div>
+              
+              <button type="submit" class="btn btn-primary">Login</button>
+              <input type="hidden" name="next" value="{{ next }}" />
+            </fieldset>
+          </form>
         </div>
       </div>
-      
-      <button type="submit" class="btn btn-primary">Login</button>
-      <input type="hidden" name="next" value="{{ next }}" />
-      </fieldset>
-    </form>
+    </div>
   </div>
-</div>
-</div>
 </div>
 {% endblock %}
