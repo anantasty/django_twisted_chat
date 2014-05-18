@@ -18,6 +18,7 @@ class WebsocketChat(basic.LineReceiver):
         del self.factory.client_map[self.user]
 
     def _handle_likes(self, message):
+        print "liking {}".format(message)
         ref = message['ref']
         user = message['user']
         likes_map_msg_key = 'Message:{}'.format(ref)

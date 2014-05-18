@@ -10,14 +10,14 @@
     <div class="message col-md-8"><%= item.msg %></div>
     <div class="like-message col-md-2 pull-right">
       <a href="#">Hell Yeah!</a>
-      <span class="badge"><%= item.likes %></span>
+      <span class="badge likes"><%= item.likes %></div>
     </div>
 </script>
 
 <script type="text/html" id="chat_user_list">
 <% _.each(items, function(item,key){ %>
   <li class='list-group-item'>
-    <span class="label label-danger"><%= item %></span>
+      <%= item %>
   </li>
 <% }); %>
 </script>
