@@ -166,12 +166,12 @@ LOGGING = {
 ADMIN_MEDIA_PREFIX = '/media/admin/'
 
 #email setup
-from django_twisted_chat.email_passwd import PASSWORD
+#from django_twisted_chat.email_passwd import PASSWORD
 
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'anant.asty'
-EMAIL_HOST_PASSWORD = PASSWORD
-DEFAULT_FROM_EMAIL = 'anant.asty@gmail.com'
-DEFAULT_TO_EMAIL = 'anant.asty@gmail.com'
+# EMAIL_USE_TLS = True
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = 'anant.asty'
+# EMAIL_HOST_PASSWORD = PASSWORD
+# DEFAULT_FROM_EMAIL = 'anant.asty@gmail.com'
+# DEFAULT_TO_EMAIL = 'anant.asty@gmail.com'
