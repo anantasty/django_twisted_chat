@@ -1,4 +1,0 @@
-nohup: redis-server: No such file or directory
-[24278] 09 Jun 10:39:09.596 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
-[24278] 09 Jun 10:39:09.613 * Increased maximum number of open files to 10032 (it was originally set to 256).
-[24278] 09 Jun 10:39:09.614 # Creating Server TCP listening socket *:6379: bind: Address already in use
